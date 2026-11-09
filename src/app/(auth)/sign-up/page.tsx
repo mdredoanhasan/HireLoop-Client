@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { authClient } from "@/app/lib/auth-client";
 
 function GoogleIcon() {
   return (
@@ -28,48 +29,54 @@ function GoogleIcon() {
         d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44C17.95 1.19 15.23 0 12 0A12 12 0 0 0 1.27 6.63l4 3.1C6.22 6.88 8.87 4.77 12 4.77z"
       />
     </svg>
-  )
+  );
 }
 
 const inputClass =
-  "h-11 border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500"
+  "h-11 border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500";
 
 export default function SignUpPage() {
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
     const data = {
       name: String(formData.get("name") ?? "").trim(),
       email: String(formData.get("email") ?? "").trim(),
       password: String(formData.get("password") ?? ""),
       confirmPassword: String(formData.get("confirmPassword") ?? ""),
       acceptedTerms: formData.get("terms") === "on",
-    }
+    };
+    const { data: signUpResponse, error } = await authClient.signUp.email({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    });
+    console.log( 'sigup response',signUpResponse, error);
 
     if (data.password.length < 8) {
-      setError("Password must be at least 8 characters.")
-      return
+      setError("Password must be at least 8 characters.");
+      return;
     }
     if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match.")
-      return
+      setError("Passwords do not match.");
+      return;
     }
     if (!data.acceptedTerms) {
-      setError("Please accept the Terms of Service and Privacy Policy.")
-      return
+      setError("Please accept the Terms of Service and Privacy Policy.");
+      return;
     }
 
-    setError(null)
+    setError(null);
 
     // Collected form data (replace with your API call later)
-    console.log("Sign up data:", data)
+    console.log("Sign up data:", data);
   }
 
   function handleGoogleClick() {
-    console.log("Google sign up clicked")
+    console.log("Google sign up clicked");
   }
 
   return (
@@ -77,7 +84,7 @@ export default function SignUpPage() {
       {/* Soft purple glow behind the card */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#6556ff]/20 blur-[120px]"
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-130 w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#6556ff]/20 blur-[120px]"
       />
 
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-zinc-950/80 p-6 shadow-2xl backdrop-blur-md sm:p-8">
@@ -232,5 +239,5 @@ export default function SignUpPage() {
         </p>
       </div>
     </main>
-  )
+  );
 }

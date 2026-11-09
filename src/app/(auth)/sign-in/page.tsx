@@ -1,11 +1,14 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
+import Image from "next/image";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { authClient } from "@/app/lib/auth-client";
+import { redirect } from "next/navigation";
+
 
 function GoogleIcon() {
   return (
@@ -27,28 +30,34 @@ function GoogleIcon() {
         d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44C17.95 1.19 15.23 0 12 0A12 12 0 0 0 1.27 6.63l4 3.1C6.22 6.88 8.87 4.77 12 4.77z"
       />
     </svg>
-  )
+  );
 }
 
 const inputClass =
-  "h-11 border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500"
+  "h-11 border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500";
 
 export default function SignInPage() {
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
     const data = {
       email: String(formData.get("email") ?? ""),
       password: String(formData.get("password") ?? ""),
-    }
+    };
+    const { data: signInResponse, error } = await authClient.signIn.email({
+      email: data.email, // required, The email address of the user.
+      password: data.password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
+      rememberMe: true,  // If false, the user will be signed out when the browser is closed. (optional) (default: true)
+    });
+    redirect('/')
 
     // Collected form data (replace with your API call later)
-    console.log("Sign in data:", data)
+    console.log("Sign in data:", signInResponse, error);
   }
 
   function handleGoogleClick() {
-    console.log("Google sign in clicked")
+    console.log("Google sign in clicked");
   }
 
   return (
@@ -151,5 +160,5 @@ export default function SignInPage() {
         </p>
       </div>
     </main>
-  )
+  );
 }
