@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/app/lib/auth-client";
-import { redirect } from "next/navigation";
-
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 function GoogleIcon() {
   return (
@@ -37,23 +37,34 @@ const inputClass =
   "h-11 border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500";
 
 export default function SignInPage() {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const data = {
-      email: String(formData.get("email") ?? ""),
-      password: String(formData.get("password") ?? ""),
-    };
-    const { data: signInResponse, error } = await authClient.signIn.email({
-      email: data.email, // required, The email address of the user.
-      password: data.password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
-      rememberMe: true,  // If false, the user will be signed out when the browser is closed. (optional) (default: true)
-    });
-    redirect('/')
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
 
-    // Collected form data (replace with your API call later)
-    console.log("Sign in data:", signInResponse, error);
+    const { error: authError } = await authClient.signIn.email({
+      email,
+      password,
+      rememberMe: true,
+    });
+
+    setLoading(false);
+
+    if (authError) {
+      setError(authError.message ?? "Invalid email or password.");
+      return;
+    }
+
+    router.push("/");
+    router.refresh();
   }
 
   function handleGoogleClick() {
@@ -124,12 +135,20 @@ export default function SignInPage() {
               className={inputClass}
             />
           </div>
-
+          {error && (
+            <p
+              role="alert"
+              className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400"
+            >
+              {error}
+            </p>
+          )}
           <Button
             type="submit"
-            className="h-11 w-full rounded-xl bg-[#6556ff] text-sm font-medium text-white hover:bg-[#5444f0]"
+            disabled={loading}
+            className="h-11 w-full rounded-xl bg-[#6556ff] text-sm font-medium text-white hover:bg-[#5444f0] disabled:opacity-60"
           >
-            Sign In
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
 
