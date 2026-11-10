@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Briefcase, UserSearch } from "lucide-react"
+import { Briefcase, ShieldCheck, UserSearch } from "lucide-react"
 
 import { authClient } from "@/app/lib/auth-client"
 import { Button } from "@/components/ui/button"
@@ -37,7 +37,7 @@ function GoogleIcon() {
 const inputClass =
   "h-11 border-white/10 bg-zinc-900/60 text-white placeholder:text-zinc-500"
 
-type Role = "seeker" | "recruiter"
+type Role = "seeker" | "recruiter" | "admin"
 
 const roles: {
   value: Role
@@ -56,6 +56,12 @@ const roles: {
     title: "Recruiter",
     description: "Post jobs and hire talent",
     icon: Briefcase,
+  },
+  {
+    value: "admin",
+    title: "Admin",
+    description: "Manage users and jobs",
+    icon: ShieldCheck,
   },
 ]
 
@@ -143,7 +149,7 @@ export default function SignUpPage() {
           {/* Role picker */}
           <fieldset className="space-y-2">
             <legend className="text-sm text-zinc-300">I am a</legend>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {roles.map(({ value, title, description, icon: Icon }) => (
                 <label
                   key={value}
