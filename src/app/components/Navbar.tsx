@@ -16,12 +16,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-const links = [
-  { label: "Browse Jobs", href: "/jobs" },
-  { label: "Company", href: "/company" },
-  { label: "Pricing", href: "/pricing" },
-];
-
 const primaryBtn =
   "rounded-xl bg-[#6556ff] font-medium text-white hover:bg-[#5444f0]";
 
@@ -64,6 +58,16 @@ export function Navbar() {
 
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
+
+  const links = [
+    { label: "Browse Jobs", href: "/jobs" },
+    { label: "Company", href: "/company" },
+    { label: "Pricing", href: "/pricing" },
+    {
+      label: "Dashboard",
+      href: `/Dashboard/${session?.user?.role || "seeker"}`,
+    },
+  ];
 
   const mounted = useSyncExternalStore(
     () => () => {},
