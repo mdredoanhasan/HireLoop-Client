@@ -16,6 +16,30 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+   user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: true,
+        defaultValue: "seeker",
+        input: true, // lets the sign-up request send it
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          // Only these roles can be chosen at sign up.
+          const allowed = ["seeker", "recruiter"]
+          const role = allowed.includes(user.role as string)
+            ? (user.role as string)
+            : "seeker"
+          return { data: { ...user, role } }
+        },
+      },
+    },
+  },
   database: mongodbAdapter(db, {
     client,
   }),
