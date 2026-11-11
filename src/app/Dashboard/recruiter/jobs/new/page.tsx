@@ -23,22 +23,9 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { createJobs } from "@/app/lib/action";
+import { createJobs } from "@/app/lib/action/job";
+import { JobFormData } from "@/app/lib/type";
 
-export type JobFormData = {
-  title: string;
-  companyName: string;
-  category: string;
-  jobType: string;
-  isRemote: boolean;
-  location: string;
-  deadline: string;
-  minSalary: number | null;
-  maxSalary: number | null;
-  frequency: string;
-  responsibilities: string;
-  requirements: string;
-};
 
 const categories = [
   "Engineering & Tech",
@@ -173,7 +160,7 @@ export default function PostJobPage() {
 
           <Button
             type="submit"
-            className="h-11 shrink-0 gap-2 rounded-xl bg-gradient-to-r from-[#5b4bff] to-[#7a6bff] px-6 text-[13px] font-semibold text-white shadow-[0_0_28px_rgba(101,86,255,0.45)] hover:brightness-110"
+            className="h-11 shrink-0 gap-2 rounded-xl bg-linear-to-r from-[#5b4bff] to-[#7a6bff] px-6 text-[13px] font-semibold text-white shadow-[0_0_28px_rgba(101,86,255,0.45)] hover:brightness-110"
           >
             Publish Job
             <ArrowRight className="h-4 w-4" />
@@ -246,7 +233,7 @@ export default function PostJobPage() {
                 {jobTypes.map((type) => (
                   <label
                     key={type}
-                    className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-white/[0.04] bg-[#1c1c1f] text-[13px] text-zinc-500 transition-colors hover:text-zinc-300 has-[:checked]:border-[#6556ff]/60 has-[:checked]:bg-[#22222e] has-[:checked]:font-semibold has-[:checked]:text-white"
+                    className="flex h-11 cursor-pointer items-center justify-center rounded-lg border border-white/4 bg-[#1c1c1f] text-[13px] text-zinc-500 transition-colors hover:text-zinc-300 has-checked:border-[#6556ff]/60 has-checked:bg-[#22222e] has-checked:font-semibold has-checked:text-white"
                   >
                     <input
                       type="radio"
@@ -268,7 +255,7 @@ export default function PostJobPage() {
               2. Location, Compensation &amp; Timeline
             </SectionTitle>
 
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/[0.06] bg-[#1c1c1f] px-4 py-3.5">
+            <div className="flex items-center justify-between gap-4 rounded-lg border border-white/6 bg-[#1c1c1f] px-4 py-3.5">
               <div className="flex items-center gap-4">
                 <Globe
                   className="h-4 w-4 shrink-0 text-zinc-300"
@@ -330,7 +317,7 @@ export default function PostJobPage() {
                     style={iconPad}
                     className={cn(
                       fieldClass,
-                      "[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0",
+                      "scheme-dark [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0",
                     )}
                   />
                 </div>

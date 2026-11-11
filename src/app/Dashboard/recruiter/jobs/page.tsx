@@ -20,27 +20,11 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { getJobs } from "@/app/lib/api/getJob";
+import { deleteJob } from "@/app/lib/api/deleteJobs";
+import { DeleteDialog } from "@/app/components/deleteDialog";
+import { Job } from "@/app/lib/type";
 
-// ---------------------------------------------------------------------------
-// Change this to your server URL. Your GET /jobs route should return an array.
-// ---------------------------------------------------------------------------
-
-type Job = {
-  _id: string;
-  title: string;
-  companyName: string;
-  category: string;
-  jobType: string;
-  isRemote: boolean;
-  location?: string;
-  deadline?: string | null;
-  minSalary?: number | null;
-  maxSalary?: number | null;
-  frequency?: string;
-  createdAt?: string;
-  // Optional: add this to your documents when you start tracking applicants
-  applicantsCount?: number;
-};
 
 // Icon + accent colour per category (matches the categories in the post-job form)
 const categoryStyle: Record<string, { icon: LucideIcon; text: string }> = {
@@ -125,42 +109,28 @@ export default function ManageJobsPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Fetch jobs (swap this for your own fetching if you prefer)
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadJobs() {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs`);
-        if (!res.ok) throw new Error("Request failed");
-        const data: Job[] = await res.json();
-        if (!ignore) setJobs(data);
-      } catch {
-        if (!ignore) setError("Could not load job posts. Please try again.");
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    }
-
-    loadJobs();
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  async function handleDelete(id: string) {
-    if (!window.confirm("Delete this job post? This cannot be undone.")) return;
-
+ useEffect(() => {
+  async function loadJobs() {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Delete failed");
-      setJobs((prev) => prev.filter((job) => job._id !== id));
+      const data = await getJobs();
+      setJobs(data);
     } catch {
-      setError("Could not delete the job post. Please try again.");
+      setError("Could not load job posts. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
+  loadJobs();
+}, []);
 
+ async function handleDelete(id: string) {
+  const ok = await deleteJob(id);
+  if (!ok) {
+    setError("Could not delete the job post. Please try again.");
+    return;
+  }
+  setJobs((prev) => prev.filter((job) => job._id !== id));
+}
   return (
     // root
     <div className="min-h-svh w-full min-w-0 bg-[#111112] px-6 py-8 text-white sm:px-8">
@@ -243,7 +213,7 @@ export default function ManageJobsPage() {
                 </tr>
               )}
 
-              {jobs.map((job) => {
+              {jobs.map((job:Job) => {
                 const style = categoryStyle[job.category] ?? fallbackCategory;
                 const Icon = style.icon;
                 const expired = isExpired(job.deadline);
@@ -369,15 +339,8 @@ export default function ManageJobsPage() {
                           <Pencil className="h-3 w-3" aria-hidden="true" />
                           Update
                         </Link>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(job._id)}
-                          aria-label={`Delete ${job.title}`}
-                          className="flex h-7 w-7 items-center justify-center rounded-md bg-[#1f1f22] text-zinc-400 transition-colors hover:text-red-400"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                       
+                       <DeleteDialog job={job} onConfirm={() => handleDelete(job._id)} />
 
                         <button
                           type="button"
