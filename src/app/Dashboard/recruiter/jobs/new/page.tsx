@@ -1,28 +1,44 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
+import { useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   Building2,
   CalendarDays,
   Globe,
   MapPin,
-} from "lucide-react"
+} from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { createJobs } from "@/app/lib/action";
+
+export type JobFormData = {
+  title: string;
+  companyName: string;
+  category: string;
+  jobType: string;
+  isRemote: boolean;
+  location: string;
+  deadline: string;
+  minSalary: number | null;
+  maxSalary: number | null;
+  frequency: string;
+  responsibilities: string;
+  requirements: string;
+};
 
 const categories = [
   "Engineering & Tech",
@@ -34,31 +50,37 @@ const categories = [
   "Finance",
   "Human Resources",
   "Operations",
-]
+];
 
-const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"]
+const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"];
 
-const frequencies = ["per hour", "per day", "per week", "per month", "per year"]
+const frequencies = [
+  "per hour",
+  "per day",
+  "per week",
+  "per month",
+  "per year",
+];
 
 // Shared field look: dark fill, soft border, light placeholder text like the design
 const fieldClass =
-  "h-11 rounded-lg border border-white/[0.06] bg-[#1c1c1f] px-4 text-[13px] text-zinc-200 placeholder:text-zinc-300 focus-visible:border-[#6556ff]/60 focus-visible:ring-[#6556ff]/25"
+  "h-11 rounded-lg border border-white/[0.06] bg-[#1c1c1f] px-4 text-[13px] text-zinc-200 placeholder:text-zinc-300 focus-visible:border-[#6556ff]/60 focus-visible:ring-[#6556ff]/25";
 
 const triggerClass = cn(
   fieldClass,
-  "w-full justify-between data-[size=default]:h-11"
-)
+  "w-full justify-between data-[size=default]:h-11",
+);
 
 const areaClass =
-  "min-h-24 rounded-lg border border-white/[0.06] bg-[#1c1c1f] px-4 py-3 text-[13px] leading-relaxed text-zinc-200 placeholder:text-zinc-300 focus-visible:border-[#6556ff]/60 focus-visible:ring-[#6556ff]/25"
+  "min-h-24 rounded-lg border border-white/[0.06] bg-[#1c1c1f] px-4 py-3 text-[13px] leading-relaxed text-zinc-200 placeholder:text-zinc-300 focus-visible:border-[#6556ff]/60 focus-visible:ring-[#6556ff]/25";
 
-const labelClass = "text-xs font-normal text-zinc-300"
+const labelClass = "text-xs font-normal text-zinc-300";
 
 // Inline so the icon never overlaps the text
-const iconPad = { paddingLeft: "2.5rem" }
+const iconPad = { paddingLeft: "2.5rem" };
 
 const iconClass =
-  "pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+  "pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400";
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -69,39 +91,39 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
       />
       {children}
     </h2>
-  )
+  );
 }
 
 function Required() {
-  return <span className="ml-0.5 text-[#7b6dff]">*</span>
+  return <span className="ml-0.5 text-[#7b6dff]">*</span>;
 }
 
 export default function PostJobPage() {
   // Default matches the design; set to "" if you want the user to choose
-  const [category, setCategory] = useState("Engineering & Tech")
-  const [frequency, setFrequency] = useState("per hour")
-  const [isRemote, setIsRemote] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [category, setCategory] = useState("Engineering & Tech");
+  const [frequency, setFrequency] = useState("per hour");
+  const [isRemote, setIsRemote] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-    const formData = new FormData(e.currentTarget)
-    const minSalary = String(formData.get("minSalary") ?? "")
-    const maxSalary = String(formData.get("maxSalary") ?? "")
+    const formData = new FormData(e.currentTarget);
+    const minSalary = String(formData.get("minSalary") ?? "");
+    const maxSalary = String(formData.get("maxSalary") ?? "");
 
     if (!category) {
-      setError("Please choose a job category.")
-      return
+      setError("Please choose a job category.");
+      return;
     }
     if (minSalary && maxSalary && Number(minSalary) > Number(maxSalary)) {
-      setError("Minimum salary cannot be higher than maximum salary.")
-      return
+      setError("Minimum salary cannot be higher than maximum salary.");
+      return;
     }
 
-    setError(null)
+    setError(null);
 
-    const data = {
+    const data: JobFormData = {
       title: String(formData.get("title") ?? "").trim(),
       companyName: String(formData.get("companyName") ?? "").trim(),
       category,
@@ -114,16 +136,17 @@ export default function PostJobPage() {
       frequency,
       responsibilities: String(formData.get("responsibilities") ?? "").trim(),
       requirements: String(formData.get("requirements") ?? "").trim(),
-    }
+    };
 
     // Collected form data (replace with your API call later)
-    console.log("Post job data:", data)
+    const result = await createJobs(data);
+    console.log(result);
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="min-h-full w-full bg-black px-6 py-10 text-white sm:px-8"
+      className="min-h-full w-full bg-[#111112]  px-6 py-10 text-white sm:px-8"
     >
       {/* Full width of the right-hand area, like the design */}
       <div className="w-full">
@@ -241,7 +264,9 @@ export default function PostJobPage() {
 
           {/* 2. Location, compensation and timeline */}
           <section className="space-y-5">
-            <SectionTitle>2. Location, Compensation &amp; Timeline</SectionTitle>
+            <SectionTitle>
+              2. Location, Compensation &amp; Timeline
+            </SectionTitle>
 
             <div className="flex items-center justify-between gap-4 rounded-lg border border-white/[0.06] bg-[#1c1c1f] px-4 py-3.5">
               <div className="flex items-center gap-4">
@@ -305,7 +330,7 @@ export default function PostJobPage() {
                     style={iconPad}
                     className={cn(
                       fieldClass,
-                      "[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
+                      "[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0",
                     )}
                   />
                 </div>
@@ -426,5 +451,5 @@ export default function PostJobPage() {
         </div>
       </div>
     </form>
-  )
+  );
 }
