@@ -69,7 +69,10 @@ function BulletList({ items }: { items: string[] }) {
   return (
     <ul className="mt-4 space-y-3">
       {items.map((item) => (
-        <li key={item} className="flex gap-3 text-sm leading-relaxed text-zinc-400">
+        <li
+          key={item}
+          className="flex gap-3 text-sm leading-relaxed text-zinc-400"
+        >
           <span className="mt-2 size-1.5 shrink-0 rounded-full bg-zinc-300" />
           {item}
         </li>
@@ -126,7 +129,7 @@ async function JobDetails({ params }: { params: Promise<{ id: string }> }) {
 
         <div className="flex items-center gap-3">
           <BookmarkButton />
-          <ApplyButton />
+          <ApplyButton job={job} />
         </div>
       </div>
 
@@ -138,7 +141,11 @@ async function JobDetails({ params }: { params: Promise<{ id: string }> }) {
             <StatCard
               icon={Banknote}
               label="Salary Range"
-              value={hasSalary ? `€${job.minSalary} - €${job.maxSalary}` : "Not specified"}
+              value={
+                hasSalary
+                  ? `€${job.minSalary} - €${job.maxSalary}`
+                  : "Not specified"
+              }
               note={hasSalary ? job.frequency : undefined}
             />
             <StatCard icon={MapPin} label="Location" value={locationText} />
@@ -183,7 +190,9 @@ async function JobDetails({ params }: { params: Promise<{ id: string }> }) {
 
         {/* Right side: company overview */}
         <aside className="rounded-xl border border-white/10 bg-zinc-950/60 p-5">
-          <h2 className="text-base font-semibold text-white">Company Overview</h2>
+          <h2 className="text-base font-semibold text-white">
+            Company Overview
+          </h2>
 
           <div className="mt-4 flex h-44 items-center justify-center rounded-lg bg-zinc-900">
             <Building2 className="size-10 text-zinc-600" aria-hidden="true" />
@@ -196,7 +205,9 @@ async function JobDetails({ params }: { params: Promise<{ id: string }> }) {
             </div>
             <div className="flex items-center justify-between pt-4">
               <dt className="text-xs uppercase text-zinc-500">Apply by</dt>
-              <dd className="text-zinc-200">{job.deadline || "Not specified"}</dd>
+              <dd className="text-zinc-200">
+                {job.deadline || "Not specified"}
+              </dd>
             </div>
           </dl>
 
@@ -232,7 +243,9 @@ export default function JobDetailPage({
         </Link>
 
         <Suspense
-          fallback={<p className="mt-6 text-sm text-zinc-400">Loading job...</p>}
+          fallback={
+            <p className="mt-6 text-sm text-zinc-400">Loading job...</p>
+          }
         >
           <JobDetails params={params} />
         </Suspense>

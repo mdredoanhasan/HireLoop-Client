@@ -20,3 +20,12 @@ export type Job = JobFormData & {
   recruiterId: string
   createdAt: string
 }
+
+export type JobApplication = {
+  jobId: string;
+  userId: string;
+  email: string;
+  jobTitle: string;
+  companyName: string;
+  appliedAt: string;
+};

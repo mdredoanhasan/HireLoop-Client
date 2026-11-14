@@ -119,11 +119,11 @@ export function Hero() {
 
       {/* ===== Bottom: tagline + stats over the globe ===== */}
       <div className="relative mt-10 overflow-hidden">
-        <div className="relative mx-auto w-full max-w-[1440px] px-4 pb-16 pt-[24%] sm:px-6">
+        <div className="relative mx-auto w-full max-w-360 px-4 pb-16 pt-[24%] sm:px-6">
           {/* Globe: crops off the pink glow, keeps the globe */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-0 top-0 -z-10 aspect-[1440/1232]"
+            className="pointer-events-none absolute inset-x-0 top-0 -z-10 aspect-1440/1232"
           >
             <Image
               src="/images/globe.png"
