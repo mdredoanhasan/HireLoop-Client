@@ -11,5 +11,8 @@ export const createJobs = async (data: JobFormData) => {
     },
     body: JSON.stringify(data),
   });
-  return res.json();
+
+  if (!res.ok) {
+    throw new Error("Could not create job post.");
+  }
 };

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/toast";
 import { createJobs } from "@/app/lib/action/job";
 import { JobFormData } from "@/app/lib/type";
 
@@ -125,9 +126,16 @@ export default function PostJobPage() {
       requirements: String(formData.get("requirements") ?? "").trim(),
     };
 
-    // Collected form data (replace with your API call later)
-    const result = await createJobs(data);
-    console.log(result);
+    try {
+      await createJobs(data);
+      toast.add({
+        title: "Job posted",
+        description: "Your job post was published successfully.",
+        type: "success",
+      });
+    } catch {
+      setError("Could not publish the job post. Please try again.");
+    }
   }
 
   return (

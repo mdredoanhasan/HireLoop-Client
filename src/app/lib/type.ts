@@ -1,4 +1,5 @@
 export type JobFormData = {
+  id:string,
   title: string;
   companyName: string;
   category: string;

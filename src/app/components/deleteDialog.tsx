@@ -1,4 +1,4 @@
-'use client'
+
 import { Trash2Icon } from "lucide-react";
 import {
   AlertDialog,
@@ -24,7 +24,7 @@ export function DeleteDialog({
   onConfirm: () => void;
 }) {
   return (
-   <AlertDialog>
+    <AlertDialog>
       <AlertDialogTrigger
         render={
           <Button variant="destructive" aria-label={`Delete ${job.title}`}>

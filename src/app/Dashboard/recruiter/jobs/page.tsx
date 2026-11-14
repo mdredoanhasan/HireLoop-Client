@@ -14,12 +14,12 @@ import {
   Plus,
   Server,
   ShieldCheck,
-  Trash2,
   Users,
   type LucideIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { toast } from "@/components/ui/toast";
 import { getJobs } from "@/app/lib/api/getJob";
 import { deleteJob } from "@/app/lib/api/deleteJobs";
 import { DeleteDialog } from "@/app/components/deleteDialog";
@@ -124,12 +124,23 @@ export default function ManageJobsPage() {
 }, []);
 
  async function handleDelete(id: string) {
-  const ok = await deleteJob(id);
-  if (!ok) {
+  try {
+    const ok = await deleteJob(id);
+    if (!ok) {
+      setError("Could not delete the job post. Please try again.");
+      return;
+    }
+
+    setJobs((prev) => prev.filter((job) => job._id !== id));
+    setError(null);
+    toast.add({
+      title: "Job post deleted",
+      description: "The job post was deleted successfully.",
+      type: "success",
+    });
+  } catch {
     setError("Could not delete the job post. Please try again.");
-    return;
   }
-  setJobs((prev) => prev.filter((job) => job._id !== id));
 }
   return (
     // root
